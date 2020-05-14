@@ -1,0 +1,34 @@
+{
+    "__comments__": "under inline, we download dependencies, Ansible and run it from the machine. Access key and secret key must be passed as parameters on the run command like the example: 'packer build -var 'aws_access_key=<access_key>' -var 'aws_secret_key=<secret_key>' aws-template.json'",
+    "variables": {
+        "aws_access_key": "",
+        "aws_secret_key": ""
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "access_key": "{{user `aws_access_key`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "region": "us-east-1",
+        "source_ami": "ami-0323c3dd2da7fb37d",
+        "tags":[{"Name":"archTestIlegraAMI"}],
+        "instance_type": "t2.micro",
+        "ssh_username": "ec2-user",
+        "ami_name": "packer-with-ansible-java-logs-microservice-redis-{{timestamp}}"
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "inline": [
+            "sudo yum update -y",
+            "sudo yum install -y git",
+            "sudo mkdir /home/ansible",
+            "sudo sh -c 'touch /home/ansible/ansible_hosts'",
+            "sudo sh -c 'echo \"[localhost]\" > /home/ansible/ansible_hosts'",
+            "sudo sh -c 'echo \"localhost  ansible_connection=local\" >> /home/ansible/ansible_hosts'",
+            "sudo sh -c 'echo \"export ANSIBLE_INVENTORY=~/ansible_hosts\" >> /etc/profile'",
+            "sudo amazon-linux-extras install epel -y",
+            "sudo yum install ansible -y",
+            "sudo git clone https://298fe6755e0453db49220cf6f33c78e25c2a4fd5@github.com/guisesterheim/LogServiceWithRedis/",
+            "sudo ansible-playbook LogServiceWithRedis/ansible_startup/site.yml"
+        ]
+    }]
+}

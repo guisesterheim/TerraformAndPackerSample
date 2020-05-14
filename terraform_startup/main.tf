@@ -25,5 +25,9 @@ module "network" {
 }
 
 module "instances" {
+    imported_sg_ssh = module.network.aws_security_group_ssh_id
+    imported_sg_app = module.network.aws_security_group_app_id
+    imported_subnet_id = module.network.aws_subnet_id
+
     source = "./modules/instances"
 }

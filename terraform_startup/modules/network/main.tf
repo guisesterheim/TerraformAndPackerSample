@@ -76,3 +76,7 @@ output "aws_security_group_ssh_id" {
 output "aws_security_group_app_id" {
     value = aws_security_group.arch_test_allow_app.id
 }
+
+output "aws_subnet_id" {
+    value = aws_subnet.appSubNet.id
+}

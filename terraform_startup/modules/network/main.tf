@@ -69,5 +69,10 @@ resource "aws_security_group" "arch_test_allow_app" {
   }
 }
 
-var.allow_app_sg = aws_security_group.arch_test_allow_app.id
-var.allow_ssh_sg = aws_security_group.arch_test_allow_ssh.id
+output "aws_security_group_ssh_id" {
+    value = aws_security_group.arch_test_allow_ssh.id
+}
+
+output "aws_security_group_app_id" {
+    value = aws_security_group.arch_test_allow_app.id
+}

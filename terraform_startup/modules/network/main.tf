@@ -68,3 +68,6 @@ resource "aws_security_group" "arch_test_allow_app" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+var.allow_app_sg = aws_security_group.arch_test_allow_app.id
+var.allow_ssh_sg = aws_security_group.arch_test_allow_ssh.id

@@ -14,7 +14,7 @@ resource "aws_instance" "app" {
     ami = data.aws_ami.image.id
     instance_type = "t2.micro"
     user_data = file("run_app.sh")
-    vpc_security_group_ids=[aws_security_group.arch_test_allow_app.id, aws_security_group.arch_test_allow_ssh.id]
+    vpc_security_group_ids=[var.allow_app_sg, var.allow_ssh_sg]
     key_name = "ssh_terraform"
     subnet_id = aws_subnet.appSubNet.id
     associate_public_ip_address = true

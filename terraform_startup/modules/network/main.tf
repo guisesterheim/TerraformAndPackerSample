@@ -124,8 +124,8 @@ resource "aws_security_group" "arch_test_external_app" {
     description = "Inbound external"
     from_port   = 0
     to_port     = 80
-    protocol    = "HTTP"
-    cidr_blocks = ["0.0.0.0/0", "::/0"]
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -138,11 +138,6 @@ resource "aws_security_group" "arch_test_external_app" {
 
 resource "aws_route_table" "archTestRoute" {
   vpc_id = aws_vpc.archTestVPC.id
-
-  route {
-    cidr_block = "10.0.0.0/16"
-    gateway_id = "local"
-  }
 
   route {
     cidr_block = "0.0.0.0/0"

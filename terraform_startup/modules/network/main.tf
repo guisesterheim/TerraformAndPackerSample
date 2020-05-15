@@ -12,7 +12,7 @@ resource "aws_vpc" "archTestVPC" {
 resource "aws_subnet" "appSubNetEast" {
   vpc_id            = aws_vpc.archTestVPC.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = var.regions[0]
+  availability_zone = var.imported_az1
 
   tags = {
     Name = "Arch Test - App Subnet"
@@ -23,7 +23,7 @@ resource "aws_subnet" "appSubNetEast" {
 resource "aws_subnet" "appSubNetSouth" {
   vpc_id            = aws_vpc.archTestVPC.id
   cidr_block        = "10.0.2.0/24"
-  availability_zone = var.regions[1]
+  availability_zone = var.imported_az2
 
   tags = {
     Name = "Arch Test - App Subnet"

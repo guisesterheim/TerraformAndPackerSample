@@ -1,16 +1,4 @@
 // Check which is the most recent AMI image to use
-variable "imported_subnet_id" {
-    type = string
-}
-
-variable "imported_sg_ssh" {
-    type = string
-}
-
-variable "imported_sg_app" {
-    type = string
-}
-
 data "aws_ami" "image" {
   most_recent = true
   owners = ["self"]
@@ -35,12 +23,12 @@ resource "aws_launch_configuration" "archTestConfig" {
 }
 
 resource "aws_autoscaling_group" "archTestAutoscalingGroup" {
-  availability_zones = var.regions
+  availability_zones = [var.imported_az1, var.imported_az2]
   desired_capacity   = 1
   max_size           = 1
   min_size           = 1
   launch_configuration = aws_launch_configuration.archTestConfig.name
-  vpc_zone_identifier  = [var.imported_subnet_east_id, var.imported_subnet_south_id]
+  vpc_zone_identifier  = [var.imported_subneteast_id, var.imported_subnetsouth_id]
 }
 
 // Creates the instances

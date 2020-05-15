@@ -1,10 +1,6 @@
 
-variable "aws_region1" {
-    description = "AWS Region 1"
-}
-
-variable "aws_region2" {
-    description = "AWS Region 2"
+variable "aws_region" {
+    description = "AWS Region"
 }
 
 variable "aws_access_key" {
@@ -15,12 +11,12 @@ variable "aws_secret_key" {
     description = "AWS Secret KEy"
 }
 
-variable "availability_zone_us_east_1d" {
+variable "availability_zone_us_east_1" {
     description = "Availability zone 1"
-    value = "us-east-1d"
+    default = "us-east-1a"
 }
 
-variable "availability_zone_us_east_1e" {
+variable "availability_zone_us_east_2" {
     description = "Availability zone 2"
-    value = "us-east-1e"
+    default = "us-east-1b"
 }

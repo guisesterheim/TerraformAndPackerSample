@@ -23,12 +23,61 @@ resource "aws_launch_configuration" "archTestConfig" {
 }
 
 resource "aws_autoscaling_group" "archTestAutoscalingGroup" {
-  availability_zones = [var.imported_az1, var.imported_az2]
-  desired_capacity   = 1
-  max_size           = 1
-  min_size           = 1
-  launch_configuration = aws_launch_configuration.archTestConfig.name
-  vpc_zone_identifier  = [var.imported_subneteast_id, var.imported_subnetsouth_id]
+  name                      = "ArchTestAutoscalingGroup"
+  max_size                  = 1
+  min_size                  = 1
+  desired_capacity          = 1
+  health_check_grace_period = 300
+  force_delete              = true
+  launch_configuration      = aws_launch_configuration.archTestConfig.name
+  vpc_zone_identifier       = [var.imported_subnetEastA_id, var.imported_subnetEastB_id]
+}
+
+resource "aws_lb" "archTestLB" {
+  name               = "ArchTestLB"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [var.imported_sg_external]
+  subnets            = [var.imported_subnetEastA_id, var.imported_subnetEastB_id]
+}
+
+resource "aws_lb_target_group" "archTestLBTargetGroup" {
+  name     = "arc-htest-lb-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = var.imported_vpc_id
+
+  health_check {
+      enabled = true
+      path = "/healthCheck"
+  }
+}
+
+resource "aws_lb_listener" "archTestLBListener" {
+  load_balancer_arn = aws_lb.archTestLB.arn
+  port              = "8080"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.archTestLBTargetGroup.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "archTestListenerRuleStatic" {
+  listener_arn = aws_lb_listener.archTestLBListener.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.archTestLBTargetGroup.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
 }
 
 // Creates the instances

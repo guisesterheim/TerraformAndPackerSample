@@ -1,8 +1,8 @@
-variable "imported_subneteast_id" {
+variable "imported_subnetEastA_id" {
     type = string
 }
 
-variable "imported_subnetsouth_id" {
+variable "imported_subnetEastB_id" {
     type = string
 }
 
@@ -14,10 +14,18 @@ variable "imported_sg_app" {
     type = string
 }
 
+variable "imported_sg_external" {
+    type = string
+}
+
 variable "imported_az1" {
     type = string
 }
 
 variable "imported_az2" {
+    type = string
+}
+
+variable "imported_vpc_id" {
     type = string
 }

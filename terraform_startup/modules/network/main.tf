@@ -116,7 +116,7 @@ resource "aws_security_group" "arch_test_allow_app" {
 }
 
 resource "aws_security_group" "arch_test_external_app" {
-  name        = "Arch Test allow App"
+  name        = "Arch Test Allow External App"
   description = "Allow App 8080 inbound traffic"
   vpc_id      = aws_vpc.archTestVPC.id
 
@@ -133,6 +133,24 @@ resource "aws_security_group" "arch_test_external_app" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_route_table" "archTestRoute" {
+  vpc_id = aws_vpc.archTestVPC.id
+
+  route {
+    cidr_block = "10.0.0.0/16"
+    gateway_id = "local"
+  }
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.archTestInternetGateway.id
+  }
+
+  tags = {
+    Name = "Route Gateway"
   }
 }
 

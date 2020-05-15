@@ -42,7 +42,7 @@ resource "aws_lb" "archTestLB" {
 }
 
 resource "aws_lb_target_group" "archTestLBTargetGroup" {
-  name     = "arc-htest-lb-tg"
+  name     = "ArchTestLB-TG"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = var.imported_vpc_id
@@ -51,6 +51,11 @@ resource "aws_lb_target_group" "archTestLBTargetGroup" {
       enabled = true
       path = "/healthCheck"
   }
+}
+
+resource "aws_autoscaling_attachment" "archTestAttachment" {
+    autoscaling_group_name  = aws_autoscaling_group.archTestAutoscalingGroup.id
+    elb                     = aws_lb.archTestLB.id
 }
 
 resource "aws_lb_listener" "archTestLBListener" {

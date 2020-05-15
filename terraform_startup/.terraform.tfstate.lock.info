@@ -1,1 +1,1 @@
-{"ID":"6a5ed7aa-e1fc-e085-7b1b-8af9a6228c5b","Operation":"OperationTypeApply","Info":"","Who":"sesterheim@sesterheim","Version":"0.12.24","Created":"2020-05-15T20:08:06.537774587Z","Path":"terraform.tfstate"}
+{"ID":"99d26ba5-bb9b-d72e-c4af-345545b6fb77","Operation":"OperationTypePlan","Info":"","Who":"sesterheim@sesterheim","Version":"0.12.24","Created":"2020-05-15T20:34:18.659558592Z","Path":"terraform.tfstate"}

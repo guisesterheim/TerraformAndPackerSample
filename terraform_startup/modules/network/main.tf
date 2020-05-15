@@ -9,9 +9,21 @@ resource "aws_vpc" "archTestVPC" {
 }
 
 // Creates the App Subnet
-resource "aws_subnet" "appSubNet" {
-  vpc_id     = aws_vpc.archTestVPC.id
-  cidr_block = "10.0.1.0/24"
+resource "aws_subnet" "appSubNetEast" {
+  vpc_id            = aws_vpc.archTestVPC.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = var.regions[0]
+
+  tags = {
+    Name = "Arch Test - App Subnet"
+  }
+}
+
+// Creates the App Subnet
+resource "aws_subnet" "appSubNetSouth" {
+  vpc_id            = aws_vpc.archTestVPC.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = var.regions[1]
 
   tags = {
     Name = "Arch Test - App Subnet"
@@ -77,6 +89,9 @@ output "aws_security_group_app_id" {
     value = aws_security_group.arch_test_allow_app.id
 }
 
-output "aws_subnet_id" {
-    value = aws_subnet.appSubNet.id
+output "aws_subnet_east_id" {
+    value = aws_subnet.appSubNetEast.id
+}
+output "aws_subnet_south_id" {
+    value = aws_subnet.appSubNetSouth.id
 }

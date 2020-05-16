@@ -13,32 +13,13 @@ resource "aws_launch_configuration" "archTestConfig" {
   image_id                      = data.aws_ami.image.id
   instance_type                 = "t2.micro"
   security_groups               = [var.imported_sg_ssh, var.imported_sg_app]
-  associate_public_ip_address   = false
+  associate_public_ip_address   = true // TODO: switch to false
   user_data                     = file("run_app.sh")
   key_name                      = "ssh_terraform"
 
   lifecycle {
     create_before_destroy = true
   }
-}
-
-resource "aws_autoscaling_group" "archTestAutoscalingGroup" {
-  name                      = "ArchTestAutoscalingGroup"
-  max_size                  = 1
-  min_size                  = 1
-  desired_capacity          = 1
-  health_check_grace_period = 300
-  force_delete              = true
-  launch_configuration      = aws_launch_configuration.archTestConfig.name
-  vpc_zone_identifier       = [var.imported_subnetEastA_id, var.imported_subnetEastB_id]
-}
-
-resource "aws_lb" "archTestLB" {
-  name               = "ArchTestLB"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [var.imported_sg_external]
-  subnets            = [var.imported_subnetEastA_id, var.imported_subnetEastB_id]
 }
 
 resource "aws_lb_target_group" "archTestLBTargetGroup" {
@@ -53,11 +34,26 @@ resource "aws_lb_target_group" "archTestLBTargetGroup" {
   }
 }
 
-resource "aws_autoscaling_attachment" "archTestAttachment" {
-    autoscaling_group_name  = aws_autoscaling_group.archTestAutoscalingGroup.id
-    elb                     = aws_lb.archTestLB.id
+resource "aws_autoscaling_group" "archTestAutoscalingGroup" {
+  name                      = "ArchTestAutoscalingGroup"
+  max_size                  = 1
+  min_size                  = 1
+  desired_capacity          = 1
+  health_check_grace_period = 300
+  force_delete              = true
+  launch_configuration      = aws_launch_configuration.archTestConfig.name
+  vpc_zone_identifier       = [var.imported_subnetEastA_id, var.imported_subnetEastB_id]
+  target_group_arns         = [aws_lb_target_group.archTestLBTargetGroup.arn]
 
-    depends_on = [aws_autoscaling_group.archTestAutoscalingGroup, aws_lb.archTestLB]
+  depends_on                = [aws_lb_target_group.archTestLBTargetGroup]
+}
+
+resource "aws_lb" "archTestLB" {
+  name               = "ArchTestLB"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [var.imported_sg_external]
+  subnets            = [var.imported_subnetEastA_id, var.imported_subnetEastB_id]
 }
 
 resource "aws_lb_listener" "archTestLBListener" {

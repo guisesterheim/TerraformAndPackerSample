@@ -94,17 +94,25 @@ resource "aws_security_group" "arch_test_allow_ssh" {
   }
 }
 
-resource "aws_security_group" "arch_test_allow_app" {
-  name        = "Arch Test allow App"
+resource "aws_security_group" "arch_test_external_app" {
+  name        = "Arch Test Allow External App"
   description = "Allow App 8080 inbound traffic"
   vpc_id      = aws_vpc.archTestVPC.id
 
   ingress {
-    description = "8080 from VPC"
+    description = "Inbound external"
+    from_port   = 80
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Inbound external"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.archTestVPC.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -115,17 +123,27 @@ resource "aws_security_group" "arch_test_allow_app" {
   }
 }
 
-resource "aws_security_group" "arch_test_external_app" {
-  name        = "Arch Test Allow External App"
+resource "aws_security_group" "arch_test_allow_app" {
+  name        = "Arch Test allow App"
   description = "Allow App 8080 inbound traffic"
   vpc_id      = aws_vpc.archTestVPC.id
 
   ingress {
-    description = "Inbound external"
-    from_port   = 0
-    to_port     = 80
+    description = "8080 from VPC"
+    from_port   = 8080
+    to_port     = 8080
+    security_groups = [aws_security_group.arch_test_external_app.id]
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [aws_vpc.archTestVPC.cidr_block]
+  }
+
+  ingress {
+    description = "8080 from VPC"
+    from_port   = 80
+    to_port     = 80
+    security_groups = [aws_security_group.arch_test_external_app.id]
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.archTestVPC.cidr_block]
   }
 
   egress {
@@ -134,6 +152,8 @@ resource "aws_security_group" "arch_test_external_app" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  depends_on    = [aws_security_group.arch_test_external_app]
 }
 
 resource "aws_route_table" "archTestRoute" {

@@ -53,12 +53,12 @@ resource "aws_lb" "archTestLB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [var.imported_sg_external]
-  subnets            = [var.imported_subnetEastA_id, var.imported_subnetEastB_id]
+  subnets            = [var.imported_publicSubnetEastA_id, var.imported_publicSubnetEastB_id]
 }
 
 resource "aws_lb_listener" "archTestLBListener" {
   load_balancer_arn = aws_lb.archTestLB.arn
-  port              = "8080"
+  port              = "80"
   protocol          = "HTTP"
 
   default_action {

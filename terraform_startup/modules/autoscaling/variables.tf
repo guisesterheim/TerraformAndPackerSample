@@ -6,6 +6,13 @@ variable "imported_subnetEastB_id" {
     type = string
 }
 
+variable "imported_publicSubnetEastA_id" {
+    type = string
+}
+variable "imported_publicSubnetEastB_id" {
+    type = string
+}
+
 variable "imported_sg_ssh" {
     type = string
 }

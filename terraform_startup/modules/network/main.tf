@@ -17,6 +17,28 @@ resource "aws_internet_gateway" "archTestInternetGateway" {
 }
 
 // Creates the App Subnet
+resource "aws_subnet" "publicSubNetEastA" {
+  vpc_id            = aws_vpc.archTestVPC.id
+  cidr_block        = "10.0.0.0/24"
+  availability_zone = var.imported_az1
+
+  tags = {
+    Name = "Arch Test - Public Subnet A"
+  }
+}
+
+// Creates the App Subnet
+resource "aws_subnet" "publicSubNetEastB" {
+  vpc_id            = aws_vpc.archTestVPC.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = var.imported_az2
+
+  tags = {
+    Name = "Arch Test - Public Subnet B"
+  }
+}
+
+// Creates the App Subnet
 resource "aws_subnet" "appSubNetEastA" {
   vpc_id            = aws_vpc.archTestVPC.id
   cidr_block        = "10.0.1.0/24"
@@ -30,7 +52,7 @@ resource "aws_subnet" "appSubNetEastA" {
 // Creates the App Subnet
 resource "aws_subnet" "appSubNetEastB" {
   vpc_id            = aws_vpc.archTestVPC.id
-  cidr_block        = "10.0.2.0/24"
+  cidr_block        = "10.0.3.0/24"
   availability_zone = var.imported_az2
 
   tags = {
@@ -56,7 +78,7 @@ resource "aws_eip" "archTestNATIPEastB" {
 
 resource "aws_nat_gateway" "archTestNATEastA" {
   allocation_id = aws_eip.archTestNATIPEastA.id
-  subnet_id     = aws_subnet.appSubNetEastA.id
+  subnet_id     = aws_subnet.publicSubNetEastA.id
 
   tags = {
     Name = "NAT Gateway East A"
@@ -65,7 +87,7 @@ resource "aws_nat_gateway" "archTestNATEastA" {
 
 resource "aws_nat_gateway" "archTestNATEastB" {
   allocation_id = aws_eip.archTestNATIPEastB.id
-  subnet_id     = aws_subnet.appSubNetEastB.id
+  subnet_id     = aws_subnet.publicSubNetEastB.id
 
   tags = {
     Name = "NAT Gateway East B"
@@ -79,11 +101,11 @@ resource "aws_security_group" "arch_test_allow_ssh" {
   vpc_id      = aws_vpc.archTestVPC.id
 
   ingress {
-    description = "SSH from VPC"
+    description = "SSH from Anywhere"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${aws_vpc.archTestVPC.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -100,19 +122,12 @@ resource "aws_security_group" "arch_test_external_app" {
   vpc_id      = aws_vpc.archTestVPC.id
 
   ingress {
-    description = "Inbound external"
-    from_port   = 80
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Inbound external"
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description       = "Inbound external"
+    from_port         = 80
+    to_port           = 80
+    protocol          = "tcp"
+    cidr_blocks       = ["0.0.0.0/0"]
+    ipv6_cidr_blocks  = ["::/0"]
   }
 
   egress {
@@ -129,12 +144,11 @@ resource "aws_security_group" "arch_test_allow_app" {
   vpc_id      = aws_vpc.archTestVPC.id
 
   ingress {
-    description = "8080 from VPC"
+    description = "80 from VPC"
     from_port   = 8080
     to_port     = 8080
     security_groups = [aws_security_group.arch_test_external_app.id]
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.archTestVPC.cidr_block]
   }
 
   ingress {
@@ -143,7 +157,6 @@ resource "aws_security_group" "arch_test_allow_app" {
     to_port     = 80
     security_groups = [aws_security_group.arch_test_external_app.id]
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.archTestVPC.cidr_block]
   }
 
   egress {
@@ -156,7 +169,7 @@ resource "aws_security_group" "arch_test_allow_app" {
   depends_on    = [aws_security_group.arch_test_external_app]
 }
 
-resource "aws_route_table" "archTestRoute" {
+resource "aws_route_table" "archTestRoutePublicA" {
   vpc_id = aws_vpc.archTestVPC.id
 
   route {
@@ -165,8 +178,64 @@ resource "aws_route_table" "archTestRoute" {
   }
 
   tags = {
-    Name = "Route Gateway"
+    Name = "Public Route Gateway"
   }
+}
+
+resource aws_route_table_association "archTestAssocPublicA" {
+  count = 2
+
+  subnet_id       = element([aws_subnet.publicSubNetEastA.id, aws_subnet.publicSubNetEastB.id], count.index)
+  route_table_id  = aws_route_table.archTestRoutePublicA.id
+
+  depends_on      = [aws_subnet.publicSubNetEastA, aws_route_table.archTestRoutePublicA]
+}
+
+resource "aws_route_table" "archTestRouteAppA" {
+  vpc_id = aws_vpc.archTestVPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.archTestNATEastA.id
+  }
+
+  tags = {
+    Name = "A App Route Gateway"
+  }
+}
+
+resource aws_route_table_association "archTestAssocAppA" {
+  subnet_id       = aws_subnet.appSubNetEastA.id
+  route_table_id  = aws_route_table.archTestRouteAppA.id
+
+  depends_on      = [aws_subnet.appSubNetEastA, aws_route_table.archTestRouteAppA]
+}
+
+resource "aws_main_route_table_association" "archTestMainRouteTable" {
+  vpc_id         = aws_vpc.archTestVPC.id
+  route_table_id = aws_route_table.archTestRouteAppA.id
+
+  depends_on      = [aws_route_table_association.archTestAssocAppA]
+}
+
+resource "aws_route_table" "archTestRouteAppB" {
+  vpc_id = aws_vpc.archTestVPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.archTestNATEastB.id
+  }
+
+  tags = {
+    Name = "B App Route Gateway"
+  }
+}
+
+resource aws_route_table_association "archTestAssocAppB" {
+  subnet_id       = aws_subnet.appSubNetEastB.id
+  route_table_id  = aws_route_table.archTestRouteAppB.id
+
+  depends_on      = [aws_subnet.appSubNetEastB, aws_route_table.archTestRouteAppB]
 }
 
 output "aws_security_group_ssh_id" {
@@ -186,6 +255,13 @@ output "aws_subnet_eastA_id" {
 }
 output "aws_subnet_eastB_id" {
     value = aws_subnet.appSubNetEastB.id
+}
+
+output "aws_subnet_public_eastA_id" {
+    value = aws_subnet.publicSubNetEastA.id
+}
+output "aws_subnet_public_eastB_id" {
+    value = aws_subnet.publicSubNetEastB.id
 }
 
 output "aws_created_vpc_id" {

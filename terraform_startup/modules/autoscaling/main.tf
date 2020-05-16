@@ -13,7 +13,7 @@ resource "aws_launch_configuration" "archTestConfig" {
   image_id                      = data.aws_ami.image.id
   instance_type                 = "t2.micro"
   security_groups               = [var.imported_sg_ssh, var.imported_sg_app]
-  associate_public_ip_address   = true // TODO: switch to false
+  associate_public_ip_address   = false
   user_data                     = file("run_app.sh")
   key_name                      = "ssh_terraform"
 

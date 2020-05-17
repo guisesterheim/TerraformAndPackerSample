@@ -15,7 +15,7 @@ pipeline {
                 sh 'rm -rf packer_1.5.5_linux_amd64.zip'
                 
                 // Get the packer json build file
-                sh 'git clone https://298fe6755e0453db49220cf6f33c78e25c2a4fd5@github.com/guisesterheim/ilegraArchTestArch/''
+                sh 'git clone https://298fe6755e0453db49220cf6f33c78e25c2a4fd5@github.com/guisesterheim/ilegraArchTestArch/'
 
                 // Install Packer
                 // TODO: Change for just checking version instead of downloading packer every time

@@ -11,6 +11,7 @@ pipeline {
             steps {
                 // Clean old files
                 sh 'rm -rf terraform'
+                sh 'rm -rf ilegraArchTestArch'
                 sh 'rm -rf terraform_0.12.24_linux_amd64.zip'
 
                 // TODO: automate getting the last version of terraform

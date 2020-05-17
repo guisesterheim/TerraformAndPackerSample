@@ -22,7 +22,7 @@ pipeline {
                 sh 'git clone https://298fe6755e0453db49220cf6f33c78e25c2a4fd5@github.com/guisesterheim/ilegraArchTestArch/'
 
                 // Launch a new machine with the AMI generated on the first step
-                sh './terraform init terraform_startup/'
+                sh './terraform init ilegraArchTestArch/terraform_startup/'
                 sh './terraform plan -var aws_region=us-east-1 -var aws_access_key=$AWS_ACCESS_KEY_PSW -var aws_secret_key=$AWS_SECRET_KEY_PSW -out tfout.log ilegraArchTestArch/terraform_startup/'
                 sh './terraform apply tfout.log'
             }

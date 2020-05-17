@@ -11,7 +11,7 @@ pipeline {
             steps {
                 // Some updates and cleaning old files
                 sh 'rm -rf packer'
-                sh 'rm -rf ilegraArchTest'
+                sh 'rm -rf ilegraArchTestArch'
                 sh 'rm -rf packer_1.5.5_linux_amd64.zip'
                 
                 // Get the packer json build file

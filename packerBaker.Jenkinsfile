@@ -24,7 +24,7 @@ pipeline {
 
                 retry(3){
                     // Packer Build
-                    sh './packer build -machine-readable -var aws_access_key=$AWS_ACCESS_KEY_PSW -var aws_secret_key=$AWS_SECRET_KEY_PSW ilegraArchTest/aws-template.json | tee build.log'
+                    sh './packer build -machine-readable -var aws_access_key=$AWS_ACCESS_KEY_PSW -var aws_secret_key=$AWS_SECRET_KEY_PSW ilegraArchTestArch/aws-template.json | tee build.log'
                 }
             }
         }

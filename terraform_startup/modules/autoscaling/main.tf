@@ -14,7 +14,7 @@ resource "aws_launch_configuration" "archTestConfig" {
   instance_type                 = "t2.micro"
   security_groups               = [var.imported_sg_ssh, var.imported_sg_app]
   associate_public_ip_address   = false
-  user_data                     = file("ilegraArchTestArch/terraform_startup/run_app.sh")
+  user_data                     = file("ilegraArchTest/terraform_startup/run_app.sh")
   key_name                      = "ssh_terraform"
 
   lifecycle {

@@ -1,4 +1,4 @@
-# ilegraArchTestArch
+# Terraform and Packer + Jenkins example
 
 ## How to run?
 

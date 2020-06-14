@@ -10,7 +10,7 @@ shhhhh
 
 3. Add two credentials (username and password) to Jenkins: AWS_ACCESS_KEY_ID (access key) and AWS_SECRET_KEY (secret key)
 
-4. Use the "packerBaker.Jenkinsfile" and "terraformRunner.Jenkinsfile" to build the two requested pipelines.
+4. Use the "packerBaker.Jenkinsfile" and "terraformRunner.Jenkinsfile" to build the two pipelines.
 
 Disclaimer:
 

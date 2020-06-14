@@ -27,7 +27,7 @@
             "sudo sh -c 'echo \"export ANSIBLE_INVENTORY=~/ansible_hosts\" >> /etc/profile'",
             "sudo amazon-linux-extras install epel -y",
             "sudo yum install ansible -y",
-            "sudo git clone https://298fe6755e0453db49220cf6f33c78e25c2a4fd5@github.com/guisesterheim/LogServiceWithRedis/",
+            "sudo git clone https://github.com/guisesterheim/LogServiceWithRedis/",
             "sudo ansible-playbook LogServiceWithRedis/ansible_startup/site.yml"
         ]
     }]

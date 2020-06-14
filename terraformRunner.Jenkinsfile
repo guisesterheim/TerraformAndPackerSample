@@ -11,7 +11,7 @@ pipeline {
             steps {
                 // Clean old files
                 sh 'rm -rf terraform'
-                sh 'rm -rf ilegraArchTestArch'
+                sh 'rm -rf ilegraArchTest'
                 sh 'rm -rf terraform_0.12.24_linux_amd64.zip'
 
                 // TODO: automate getting the last version of terraform
@@ -19,7 +19,7 @@ pipeline {
                 sh 'wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip'
                 sh 'unzip -o terraform_0.12.24_linux_amd64.zip'
 
-                sh 'git clone https://298fe6755e0453db49220cf6f33c78e25c2a4fd5@github.com/guisesterheim/ilegraArchTestArch/'
+                sh 'git clone https://github.com/guisesterheim/ilegraArchTest/'
 
                 // Launch a new machine with the AMI generated on the first step
                 sh './terraform init ilegraArchTestArch/terraform_startup/'
